@@ -14,26 +14,27 @@ response = requests.get(url, headers=headers)
 if response.status_code == 200:
     soup = BeautifulSoup(response.content, "html.parser")
     
-    # === SANA ÖZEL YENİ MODERN TASARIM (DARK MODE) ===
-    # F-string kullanmıyoruz ki CSS içindeki süslü parantezler hata vermesin.
+    # === İNADINA TV ÖZEL TASARIMI ===
     html_ust = """
     <!DOCTYPE html>
     <html lang="tr">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Günün Maçları</title>
+        <title>İnadına TV - Günün Maçları</title>
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
             
             * { box-sizing: border-box; }
             body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 0; }
             
-            /* Üst Başlık */
-            .header { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 20px; text-align: center; font-size: 22px; font-weight: 700; color: #38bdf8; border-bottom: 1px solid #334155; }
+            /* Üst Başlık - İnadına TV Markası */
+            .header { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 20px 15px; text-align: center; border-bottom: 1px solid #334155; }
+            .header-title { font-size: 24px; font-weight: 800; color: #0ea5e9; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+            .header-subtitle { font-size: 13px; color: #94a3b8; font-weight: 500; letter-spacing: 0.5px; }
             
             /* Yuvarlak Hatlı Modern Sekmeler */
-            .tabs { display: flex; justify-content: center; gap: 10px; background: #0f172a; padding: 15px 10px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+            .tabs { display: flex; justify-content: center; gap: 8px; background: #0f172a; padding: 15px 10px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
             .tab-btn { flex: 1; max-width: 90px; background: #1e293b; border: 1px solid #334155; border-radius: 20px; font-size: 13px; color: #94a3b8; font-weight: 600; cursor: pointer; padding: 8px 5px; transition: all 0.3s ease; text-align: center; }
             .tab-btn.active { background: #0ea5e9; color: #fff; border-color: #0ea5e9; box-shadow: 0 0 12px rgba(14, 165, 233, 0.5); }
             
@@ -43,13 +44,13 @@ if response.status_code == 200:
             
             .saat { color: #38bdf8; font-size: 22px; font-weight: 700; min-width: 65px; border-right: 1px solid #334155; margin-right: 12px; }
             
-            .orta { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+            .orta { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
             .kanal-satiri { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
-            .kanal-isim { color: #f1f5f9; font-weight: 600; font-size: 15px; }
+            .kanal-isim { color: #f1f5f9; font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .kanal-logo { height: 22px; max-width: 60px; object-fit: contain; background: #fff; border-radius: 4px; padding: 2px; }
-            .mac-isim { color: #94a3b8; font-size: 13px; line-height: 1.4; }
+            .mac-isim { color: #94a3b8; font-size: 13px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
             
-            .sag { min-width: 50px; text-align: right; }
+            .sag { min-width: 50px; text-align: right; margin-left: 10px; }
             
             /* Yanıp Sönen Canlı Etiketi Animasyonu */
             .canli { background: #ef4444; color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; display: inline-block; animation: pulse 2s infinite; }
@@ -60,11 +61,15 @@ if response.status_code == 200:
             }
             
             .gizli { display: none !important; }
-            .alt-bilgi { text-align: center; color: #64748b; font-size: 12px; margin: 20px 0 40px 0; font-weight: 500; }
+            .alt-bilgi { text-align: center; color: #64748b; font-size: 12px; margin: 20px 0 40px 0; font-weight: 500; line-height: 1.6; }
+            .marka-renk { color: #0ea5e9; font-weight: bold; }
         </style>
     </head>
     <body>
-        <div class="header">📺 TV'de Bugün Maçlar</div>
+        <div class="header">
+            <div class="header-title">📺 İNADINA TV</div>
+            <div class="header-subtitle">Günün Maç Yayınları</div>
+        </div>
         
         <div class="tabs">
             <button class="tab-btn active" onclick="filtrele('Tumu', this)">Tüm gün</button>
@@ -77,9 +82,12 @@ if response.status_code == 200:
     
     html_alt_ilk_kisim = """
         </div>
-        <div class="alt-bilgi">Son Güncelleme: """
+        <div class="alt-bilgi">
+            © 2026 <span class="marka-renk">İnadına TV</span> Özel Yayınıdır.<br>
+            Son Güncelleme: """
         
-    html_alt_ikinci_kisim = """</div>
+    html_alt_ikinci_kisim = """
+        </div>
         <script>
             function filtrele(kategori, btn) {
                 var butonlar = document.getElementsByClassName("tab-btn");
@@ -108,14 +116,11 @@ if response.status_code == 200:
 
     satirlar = soup.find_all(["li", "div", "tr"])
     for satir in satirlar:
-        # Alt div'leri tekrar tekrar çekmemek için koruma
         if satir.name == "div" and satir.find("div"):
             continue
             
         metin = satir.get_text(separator=" | ", strip=True)
         
-        # === İŞTE O KARMAŞIK YAZIYI DÜZELTEN FİLTRE BURASI ===
-        # Eğer okunan parça 150 karakterden uzunsa, bu menüdür, maçı geç.
         if len(metin) > 150 or "Tüm gün | Futbol" in metin:
             continue
             
@@ -175,14 +180,13 @@ if response.status_code == 200:
     if mac_sayisi == 0:
         html_orta = "<div style='text-align:center; padding: 30px; color:#94a3b8;'>Şu an için gösterilecek maç bulunamadı.</div>"
 
-    # Saat bilgisini ekleyerek tüm kodları birleştiriyoruz
     zaman = datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
     tam_html = html_ust + html_orta + html_alt_ilk_kisim + zaman + html_alt_ikinci_kisim
 
     with open("index.html", "w", encoding="utf-8") as dosya:
         dosya.write(tam_html)
         
-    print(f"Harika! Toplam {mac_sayisi} maç, yeni modern tasarımla index.html dosyasına yazıldı.")
+    print(f"Harika! İnadına TV tasarımıyla toplam {mac_sayisi} maç eklendi.")
 
 else:
     print(f"Bağlantı hatası: {response.status_code}")
