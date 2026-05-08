@@ -4,18 +4,18 @@ import datetime
 import re
 
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36"
 }
 url = "https://m.sporx.com/tvdebugun/"
 
-print("Maç sitesine bağlanılıyor...")
+print("Siteden veriler çekiliyor...")
 response = requests.get(url, headers=headers)
 
 if response.status_code == 200:
-    print("Bağlantı başarılı! Maçlar toplanıyor...")
     soup = BeautifulSoup(response.content, "html.parser")
     
-    html_icerik = f"""
+    # === HTML ÜST KISIM (Tasarım ve Sekmeler) ===
+    html_ust = """
     <!DOCTYPE html>
     <html lang="tr">
     <head>
@@ -23,61 +23,152 @@ if response.status_code == 200:
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Günün Maçları</title>
         <style>
-            body {{ font-family: sans-serif; background-color: #121212; color: #ffffff; margin: 0; padding: 10px; }}
-            h2 {{ text-align: center; color: #00e676; padding-bottom: 10px; border-bottom: 1px solid #333; }}
-            .kutu {{ background: #1e1e1e; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid #00e676; }}
-            .saat-isim {{ font-size: 15px; line-height: 1.6; font-weight: 500; }}
-            .alt-bilgi {{ text-align: center; color: #888; font-size: 12px; margin-top: 20px; }}
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f5f5f5; margin: 0; padding: 0; }
+            .header { background: #fff; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid #ddd; }
+            
+            /* Sekmeler (Tabs) */
+            .tabs { display: flex; justify-content: space-around; background: #fff; padding: 10px 0; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 100; }
+            .tab-btn { background: none; border: none; font-size: 14px; color: #666; font-weight: bold; cursor: pointer; padding: 5px 10px; }
+            .tab-btn.active { color: #333; border-bottom: 3px solid #d9432e; }
+            
+            /* Maç Listesi Görünümü */
+            .kutu { display: flex; align-items: center; background: #fff; margin-bottom: 3px; padding: 12px 10px; }
+            .kutu:nth-child(even) { background-color: #fafafa; } /* Çizgili görünüm için */
+            
+            .saat { color: #d9432e; font-size: 18px; font-weight: normal; min-width: 55px; }
+            
+            .orta { flex-grow: 1; padding: 0 10px; display: flex; flex-direction: column; }
+            .kanal-satiri { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+            .kanal-isim { color: #d9432e; font-weight: bold; font-size: 15px; }
+            .kanal-logo { height: 20px; max-width: 50px; object-fit: contain; }
+            .mac-isim { color: #444; font-size: 13px; line-height: 1.4; }
+            
+            .sag { min-width: 45px; text-align: right; }
+            .canli { background: #c0392b; color: white; padding: 4px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; }
+            
+            .gizli { display: none !important; }
+            .alt-bilgi { text-align: center; color: #888; font-size: 12px; margin: 20px 0; }
         </style>
     </head>
     <body>
-        <h2>📺 Günün Maç Yayınları</h2>
+        <div class="header">TV'de Bugün Maç Yayınları</div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="filtrele('Tumu', this)">Tüm gün</button>
+            <button class="tab-btn" onclick="filtrele('Futbol', this)">Futbol</button>
+            <button class="tab-btn" onclick="filtrele('Basketbol', this)">Basketbol</button>
+            <button class="tab-btn" onclick="filtrele('Diger', this)">Diğer</button>
+        </div>
+        <div id="mac-listesi">
     """
-
-    # Akıllı Filtre: Sadece HH:MM (Örn: 19:00) saat formatını yakalayacak sistem
-    saat_sablonu = re.compile(r'\b\d{2}:\d{2}\b')
     
-    mac_sayisi = 0
-    kaydedilenler = []
-
-    # 1. Aşama: Maçları tablo içinde arama (Kanal isimleri genelde tabloda ayrılır)
-    satirlar = soup.find_all("tr")
-    for satir in satirlar:
-        hucreler = satir.find_all(["td", "th"])
-        if len(hucreler) >= 2:
-            # Sütunları (Saat - Maç Adı - Kanal) yan yana birleştir
-            metin = " - ".join([h.get_text(strip=True) for h in hucreler if h.get_text(strip=True)])
-            # İçinde saat formatı geçiyorsa ve haber başlığı değilse al
-            if saat_sablonu.search(metin) and len(metin) < 150 and metin not in kaydedilenler:
-                html_icerik += f'<div class="kutu"><div class="saat-isim">{metin}</div></div>'
-                kaydedilenler.append(metin)
-                mac_sayisi += 1
-
-    # 2. Aşama: Site listeleme mantığı kullanıyorsa (div veya li etiketlerine bakma)
-    if mac_sayisi == 0:
-        elemanlar = soup.find_all(["li", "div"])
-        for eleman in elemanlar:
-            metin = eleman.get_text(separator=" - ", strip=True)
-            # Eğer doğrudan saat ile başlıyorsa ve maç bilgisine benziyorsa al
-            if re.match(r'^\d{2}:\d{2}', metin) and len(metin) < 150 and metin not in kaydedilenler:
-                html_icerik += f'<div class="kutu"><div class="saat-isim">{metin}</div></div>'
-                kaydedilenler.append(metin)
-                mac_sayisi += 1
-
-    if mac_sayisi == 0:
-        html_icerik += "<p style='text-align:center;'>Şu an için listelenecek maç bulunamadı veya site yapısı değişti.</p>"
-
-    zaman = datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
-    html_icerik += f"""
-        <div class="alt-bilgi">Son Güncelleme: {zaman}</div>
+    # === HTML ALT KISIM VE JAVASCRIPT (Tıklama İşlemleri) ===
+    html_alt = f"""
+        </div>
+        <div class="alt-bilgi">Son Güncelleme: {datetime.datetime.now().strftime("%d-%m-%Y %H:%M")}</div>
+        
+        <script>
+            function filtrele(kategori, btn) {{
+                // Tıklanan butonun altını kırmızı çizme efekti
+                var butonlar = document.getElementsByClassName("tab-btn");
+                for (var i = 0; i < butonlar.length; i++) {{
+                    butonlar[i].classList.remove("active");
+                }}
+                btn.classList.add("active");
+                
+                // Kategorisine göre maçları gizle/göster
+                var maclar = document.getElementsByClassName("kutu");
+                for (var i = 0; i < maclar.length; i++) {{
+                    if (kategori === 'Tumu' || maclar[i].getAttribute("data-kategori") === kategori) {{
+                        maclar[i].classList.remove("gizli");
+                    }} else {{
+                        maclar[i].classList.add("gizli");
+                    }}
+                }}
+            }}
+        </script>
     </body>
     </html>
     """
 
-    with open("index.html", "w", encoding="utf-8") as dosya:
-        dosya.write(html_icerik)
+    html_orta = ""
+    mac_sayisi = 0
+    kaydedilenler = []
+
+    # === MAÇ VERİLERİNİ AKILLICA AYRIŞTIRMA ===
+    satirlar = soup.find_all(["li", "div", "tr"])
+    for satir in satirlar:
+        metin = satir.get_text(separator=" | ", strip=True)
         
-    print(f"İşlem tamam! Toplam {mac_sayisi} maç başarıyla alındı.")
+        # İçinde "19:30" gibi bir saat var mı diye bakıyoruz
+        if re.search(r'\b\d{2}:\d{2}\b', metin):
+            parcalar = [p.strip() for p in metin.split('|') if p.strip()]
+            
+            # Saati ayırıyoruz
+            saat = next((p for p in parcalar if re.match(r'^\d{2}:\d{2}$', p)), None)
+            if not saat: continue
+                
+            # Canlı yazısı var mı bakıp ayırıyoruz
+            is_live = False
+            if "Canlı" in parcalar:
+                is_live = True
+                parcalar.remove("Canlı")
+            
+            # Saati de metinden çıkarınca geriye kalanlar: Kanal İsmi ve Maç İsmi
+            parcalar = [p for p in parcalar if p != saat]
+            if len(parcalar) == 0: continue
+                
+            kanal_ismi = parcalar[0]
+            mac_ismi = " - ".join(parcalar[1:]) if len(parcalar) > 1 else ""
+            
+            # Logo çekme işlemi
+            img_tag = satir.find('img')
+            logo_url = img_tag.get('src') if img_tag else ""
+            if logo_url and not logo_url.startswith("http"):
+                if logo_url.startswith("//"): logo_url = "https:" + logo_url
+                else: logo_url = "https://m.sporx.com" + logo_url
+            
+            # Aynı maçı iki kez yazdırmamak için güvenlik önlemi
+            kimlik = f"{saat}-{kanal_ismi}-{mac_ismi}"
+            if kimlik in kaydedilenler: continue
+            kaydedilenler.append(kimlik)
+            
+            # Kategoriyi Otomatik Bulma
+            kategori = "Diger"
+            if "Futbol" in mac_ismi or "FUTBOL" in mac_ismi.upper():
+                kategori = "Futbol"
+            elif "Basketbol" in mac_ismi or "BASKETBOL" in mac_ismi.upper():
+                kategori = "Basketbol"
+            
+            # HTML Kartını Oluşturma
+            canli_html = '<div class="canli">Canlı</div>' if is_live else ''
+            logo_html = f'<img src="{logo_url}" class="kanal-logo">' if logo_url else ''
+            
+            html_orta += f"""
+            <div class="kutu" data-kategori="{kategori}">
+                <div class="saat">{saat}</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">{kanal_ismi}</span>
+                        {logo_html}
+                    </div>
+                    <div class="mac-isim">{mac_ismi}</div>
+                </div>
+                <div class="sag">
+                    {canli_html}
+                </div>
+            </div>
+            """
+            mac_sayisi += 1
+
+    if mac_sayisi == 0:
+        html_orta = "<p style='text-align:center; padding: 20px; color:#666;'>Gösterilecek maç bulunamadı.</p>"
+
+    # === TÜM PARÇALARI BİRLEŞTİR VE DOSYAYA YAZ ===
+    with open("index.html", "w", encoding="utf-8") as dosya:
+        dosya.write(html_ust + html_orta + html_alt)
+        
+    print(f"Başarılı! Toplam {mac_sayisi} maç, özel tasarımıyla index.html dosyasına eklendi.")
 
 else:
-    print("Siteye ulaşılamadı. Lütfen linki kontrol et.")
+    print(f"Bağlantı hatası: {response.status_code}")
