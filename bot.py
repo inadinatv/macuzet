@@ -14,7 +14,8 @@ response = requests.get(url, headers=headers)
 if response.status_code == 200:
     soup = BeautifulSoup(response.content, "html.parser")
     
-    # === HTML ÜST KISIM (Tasarım ve Sekmeler) ===
+    # === SANA ÖZEL YENİ MODERN TASARIM (DARK MODE) ===
+    # F-string kullanmıyoruz ki CSS içindeki süslü parantezler hata vermesin.
     html_ust = """
     <!DOCTYPE html>
     <html lang="tr">
@@ -23,35 +24,47 @@ if response.status_code == 200:
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Günün Maçları</title>
         <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f5f5f5; margin: 0; padding: 0; }
-            .header { background: #fff; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid #ddd; }
+            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
             
-            /* Sekmeler (Tabs) */
-            .tabs { display: flex; justify-content: space-around; background: #fff; padding: 10px 0; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 100; }
-            .tab-btn { background: none; border: none; font-size: 14px; color: #666; font-weight: bold; cursor: pointer; padding: 5px 10px; }
-            .tab-btn.active { color: #333; border-bottom: 3px solid #d9432e; }
+            * { box-sizing: border-box; }
+            body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 0; }
             
-            /* Maç Listesi Görünümü */
-            .kutu { display: flex; align-items: center; background: #fff; margin-bottom: 3px; padding: 12px 10px; }
-            .kutu:nth-child(even) { background-color: #fafafa; } /* Çizgili görünüm için */
+            /* Üst Başlık */
+            .header { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 20px; text-align: center; font-size: 22px; font-weight: 700; color: #38bdf8; border-bottom: 1px solid #334155; }
             
-            .saat { color: #d9432e; font-size: 18px; font-weight: normal; min-width: 55px; }
+            /* Yuvarlak Hatlı Modern Sekmeler */
+            .tabs { display: flex; justify-content: center; gap: 10px; background: #0f172a; padding: 15px 10px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+            .tab-btn { flex: 1; max-width: 90px; background: #1e293b; border: 1px solid #334155; border-radius: 20px; font-size: 13px; color: #94a3b8; font-weight: 600; cursor: pointer; padding: 8px 5px; transition: all 0.3s ease; text-align: center; }
+            .tab-btn.active { background: #0ea5e9; color: #fff; border-color: #0ea5e9; box-shadow: 0 0 12px rgba(14, 165, 233, 0.5); }
             
-            .orta { flex-grow: 1; padding: 0 10px; display: flex; flex-direction: column; }
-            .kanal-satiri { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-            .kanal-isim { color: #d9432e; font-weight: bold; font-size: 15px; }
-            .kanal-logo { height: 20px; max-width: 50px; object-fit: contain; }
-            .mac-isim { color: #444; font-size: 13px; line-height: 1.4; }
+            /* Havada Duran Kart Görünümü */
+            #mac-listesi { padding: 15px; }
+            .kutu { display: flex; align-items: center; background: #1e293b; margin-bottom: 12px; padding: 15px; border-radius: 16px; border-left: 5px solid #0ea5e9; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
             
-            .sag { min-width: 45px; text-align: right; }
-            .canli { background: #c0392b; color: white; padding: 4px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; }
+            .saat { color: #38bdf8; font-size: 22px; font-weight: 700; min-width: 65px; border-right: 1px solid #334155; margin-right: 12px; }
+            
+            .orta { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+            .kanal-satiri { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+            .kanal-isim { color: #f1f5f9; font-weight: 600; font-size: 15px; }
+            .kanal-logo { height: 22px; max-width: 60px; object-fit: contain; background: #fff; border-radius: 4px; padding: 2px; }
+            .mac-isim { color: #94a3b8; font-size: 13px; line-height: 1.4; }
+            
+            .sag { min-width: 50px; text-align: right; }
+            
+            /* Yanıp Sönen Canlı Etiketi Animasyonu */
+            .canli { background: #ef4444; color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; display: inline-block; animation: pulse 2s infinite; }
+            @keyframes pulse {
+                0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+                70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+            }
             
             .gizli { display: none !important; }
-            .alt-bilgi { text-align: center; color: #888; font-size: 12px; margin: 20px 0; }
+            .alt-bilgi { text-align: center; color: #64748b; font-size: 12px; margin: 20px 0 40px 0; font-weight: 500; }
         </style>
     </head>
     <body>
-        <div class="header">TV'de Bugün Maç Yayınları</div>
+        <div class="header">📺 TV'de Bugün Maçlar</div>
         
         <div class="tabs">
             <button class="tab-btn active" onclick="filtrele('Tumu', this)">Tüm gün</button>
@@ -62,30 +75,28 @@ if response.status_code == 200:
         <div id="mac-listesi">
     """
     
-    # === HTML ALT KISIM VE JAVASCRIPT (Tıklama İşlemleri) ===
-    html_alt = f"""
+    html_alt_ilk_kisim = """
         </div>
-        <div class="alt-bilgi">Son Güncelleme: {datetime.datetime.now().strftime("%d-%m-%Y %H:%M")}</div>
+        <div class="alt-bilgi">Son Güncelleme: """
         
+    html_alt_ikinci_kisim = """</div>
         <script>
-            function filtrele(kategori, btn) {{
-                // Tıklanan butonun altını kırmızı çizme efekti
+            function filtrele(kategori, btn) {
                 var butonlar = document.getElementsByClassName("tab-btn");
-                for (var i = 0; i < butonlar.length; i++) {{
+                for (var i = 0; i < butonlar.length; i++) {
                     butonlar[i].classList.remove("active");
-                }}
+                }
                 btn.classList.add("active");
                 
-                // Kategorisine göre maçları gizle/göster
                 var maclar = document.getElementsByClassName("kutu");
-                for (var i = 0; i < maclar.length; i++) {{
-                    if (kategori === 'Tumu' || maclar[i].getAttribute("data-kategori") === kategori) {{
+                for (var i = 0; i < maclar.length; i++) {
+                    if (kategori === 'Tumu' || maclar[i].getAttribute("data-kategori") === kategori) {
                         maclar[i].classList.remove("gizli");
-                    }} else {{
+                    } else {
                         maclar[i].classList.add("gizli");
-                    }}
-                }}
-            }}
+                    }
+                }
+            }
         </script>
     </body>
     </html>
@@ -95,52 +106,52 @@ if response.status_code == 200:
     mac_sayisi = 0
     kaydedilenler = []
 
-    # === MAÇ VERİLERİNİ AKILLICA AYRIŞTIRMA ===
     satirlar = soup.find_all(["li", "div", "tr"])
     for satir in satirlar:
+        # Alt div'leri tekrar tekrar çekmemek için koruma
+        if satir.name == "div" and satir.find("div"):
+            continue
+            
         metin = satir.get_text(separator=" | ", strip=True)
         
-        # İçinde "19:30" gibi bir saat var mı diye bakıyoruz
+        # === İŞTE O KARMAŞIK YAZIYI DÜZELTEN FİLTRE BURASI ===
+        # Eğer okunan parça 150 karakterden uzunsa, bu menüdür, maçı geç.
+        if len(metin) > 150 or "Tüm gün | Futbol" in metin:
+            continue
+            
         if re.search(r'\b\d{2}:\d{2}\b', metin):
             parcalar = [p.strip() for p in metin.split('|') if p.strip()]
             
-            # Saati ayırıyoruz
             saat = next((p for p in parcalar if re.match(r'^\d{2}:\d{2}$', p)), None)
             if not saat: continue
                 
-            # Canlı yazısı var mı bakıp ayırıyoruz
             is_live = False
             if "Canlı" in parcalar:
                 is_live = True
                 parcalar.remove("Canlı")
             
-            # Saati de metinden çıkarınca geriye kalanlar: Kanal İsmi ve Maç İsmi
             parcalar = [p for p in parcalar if p != saat]
             if len(parcalar) == 0: continue
                 
             kanal_ismi = parcalar[0]
             mac_ismi = " - ".join(parcalar[1:]) if len(parcalar) > 1 else ""
             
-            # Logo çekme işlemi
             img_tag = satir.find('img')
             logo_url = img_tag.get('src') if img_tag else ""
             if logo_url and not logo_url.startswith("http"):
                 if logo_url.startswith("//"): logo_url = "https:" + logo_url
                 else: logo_url = "https://m.sporx.com" + logo_url
             
-            # Aynı maçı iki kez yazdırmamak için güvenlik önlemi
             kimlik = f"{saat}-{kanal_ismi}-{mac_ismi}"
             if kimlik in kaydedilenler: continue
             kaydedilenler.append(kimlik)
             
-            # Kategoriyi Otomatik Bulma
             kategori = "Diger"
             if "Futbol" in mac_ismi or "FUTBOL" in mac_ismi.upper():
                 kategori = "Futbol"
             elif "Basketbol" in mac_ismi or "BASKETBOL" in mac_ismi.upper():
                 kategori = "Basketbol"
             
-            # HTML Kartını Oluşturma
             canli_html = '<div class="canli">Canlı</div>' if is_live else ''
             logo_html = f'<img src="{logo_url}" class="kanal-logo">' if logo_url else ''
             
@@ -162,13 +173,16 @@ if response.status_code == 200:
             mac_sayisi += 1
 
     if mac_sayisi == 0:
-        html_orta = "<p style='text-align:center; padding: 20px; color:#666;'>Gösterilecek maç bulunamadı.</p>"
+        html_orta = "<div style='text-align:center; padding: 30px; color:#94a3b8;'>Şu an için gösterilecek maç bulunamadı.</div>"
 
-    # === TÜM PARÇALARI BİRLEŞTİR VE DOSYAYA YAZ ===
+    # Saat bilgisini ekleyerek tüm kodları birleştiriyoruz
+    zaman = datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
+    tam_html = html_ust + html_orta + html_alt_ilk_kisim + zaman + html_alt_ikinci_kisim
+
     with open("index.html", "w", encoding="utf-8") as dosya:
-        dosya.write(html_ust + html_orta + html_alt)
+        dosya.write(tam_html)
         
-    print(f"Başarılı! Toplam {mac_sayisi} maç, özel tasarımıyla index.html dosyasına eklendi.")
+    print(f"Harika! Toplam {mac_sayisi} maç, yeni modern tasarımla index.html dosyasına yazıldı.")
 
 else:
     print(f"Bağlantı hatası: {response.status_code}")
