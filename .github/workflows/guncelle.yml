@@ -1,0 +1,33 @@
+name: Mac Verilerini Guncelle
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Bot her saat başı otomatik çalışır
+  workflow_dispatch:     # İsterseniz GitHub üzerinden butona basarak manuel de çalıştırabilirsiniz
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Depoyu Klonla
+      uses: actions/checkout@v3
+
+    - name: Python Kur
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Gerekli Kütüphaneleri Yükle
+      run: pip install requests beautifulsoup4
+
+    - name: Python Botunu Çalıştır
+      run: python bot.py
+
+    - name: Yeni Verileri GitHub'a Kaydet (Commit)
+      run: |
+        git config --global user.name "Maç Botu"
+        git config --global user.email "bot@macrehberi.com"
+        git add api.json
+        git commit -m "⏳ Veriler güncellendi" || exit 0
+        git push
