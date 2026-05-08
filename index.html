@@ -6,17 +6,991 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Günün Maçları</title>
         <style>
-            body { font-family: sans-serif; background-color: #121212; color: #ffffff; margin: 0; padding: 10px; }
-            h2 { text-align: center; color: #00e676; padding-bottom: 10px; border-bottom: 1px solid #333; }
-            .kutu { background: #1e1e1e; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid #00e676; }
-            .saat-isim { font-size: 15px; line-height: 1.6; font-weight: 500; }
-            .alt-bilgi { text-align: center; color: #888; font-size: 12px; margin-top: 20px; }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f5f5f5; margin: 0; padding: 0; }
+            .header { background: #fff; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid #ddd; }
+            
+            /* Sekmeler (Tabs) */
+            .tabs { display: flex; justify-content: space-around; background: #fff; padding: 10px 0; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 100; }
+            .tab-btn { background: none; border: none; font-size: 14px; color: #666; font-weight: bold; cursor: pointer; padding: 5px 10px; }
+            .tab-btn.active { color: #333; border-bottom: 3px solid #d9432e; }
+            
+            /* Maç Listesi Görünümü */
+            .kutu { display: flex; align-items: center; background: #fff; margin-bottom: 3px; padding: 12px 10px; }
+            .kutu:nth-child(even) { background-color: #fafafa; } /* Çizgili görünüm için */
+            
+            .saat { color: #d9432e; font-size: 18px; font-weight: normal; min-width: 55px; }
+            
+            .orta { flex-grow: 1; padding: 0 10px; display: flex; flex-direction: column; }
+            .kanal-satiri { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+            .kanal-isim { color: #d9432e; font-weight: bold; font-size: 15px; }
+            .kanal-logo { height: 20px; max-width: 50px; object-fit: contain; }
+            .mac-isim { color: #444; font-size: 13px; line-height: 1.4; }
+            
+            .sag { min-width: 45px; text-align: right; }
+            .canli { background: #c0392b; color: white; padding: 4px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; }
+            
+            .gizli { display: none !important; }
+            .alt-bilgi { text-align: center; color: #888; font-size: 12px; margin: 20px 0; }
         </style>
     </head>
     <body>
-        <h2>📺 Günün Maç Yayınları</h2>
-    <div class="kutu"><div class="saat-isim">08:00 - TRT Sporİlk Baskı (Diğer)</div></div><div class="kutu"><div class="saat-isim">08:00 - A SporSabah Sporu (Diğer)</div></div><div class="kutu"><div class="saat-isim">08:00 - HT SporBaşlama Vuruşu (Diğer)</div></div><div class="kutu"><div class="saat-isim">10:00 - TRT Sporİşitme Engellier Spor Bülteni (Diğer)</div></div><div class="kutu"><div class="saat-isim">10:00 - HT SporSpor Meddahı (Diğer)</div></div><div class="kutu"><div class="saat-isim">10:25 - TRT SporSpor Manşet (Diğer)</div></div><div class="kutu"><div class="saat-isim">11:00 - A SporSpor Ajansı (Diğer)</div></div><div class="kutu"><div class="saat-isim">11:00 - TRT SporSpor Manşet (Diğer)</div></div><div class="kutu"><div class="saat-isim">11:00 - HT SporHT Spor Gündem (Diğer)</div></div><div class="kutu"><div class="saat-isim">11:45 - Tivibu Spor 1Serbest Antrenman 1 MotoGP (Motor Sporları) - Canlı</div></div><div class="kutu"><div class="saat-isim">11:45 - S Sport PlusSerbest Antrenman 1 MotoGP (Motor Sporları) - Canlı</div></div><div class="kutu"><div class="saat-isim">12:30 - HT SporKürsü (Diğer)</div></div><div class="kutu"><div class="saat-isim">12:30 - TRT SporTRT Gün Ortası (Diğer)</div></div><div class="kutu"><div class="saat-isim">13:30 - HT SporBakış Açısı (Diğer)</div></div><div class="kutu"><div class="saat-isim">14:00 - TRT SporSpor Stüdyosu (Diğer)</div></div><div class="kutu"><div class="saat-isim">14:00 - S Sport PlusMaç 1 ATP Roma (Tenis) - Canlı</div></div><div class="kutu"><div class="saat-isim">14:00 - A SporGün Ortası (Diğer)</div></div><div class="kutu"><div class="saat-isim">15:00 - HT SporSatır Arası (Diğer)</div></div><div class="kutu"><div class="saat-isim">15:00 - A SporSpor Gündemi (Diğer)</div></div><div class="kutu"><div class="saat-isim">16:00 - TRT SporGündem Futbol (Diğer)</div></div><div class="kutu"><div class="saat-isim">16:00 - S Sport PlusAntrenman MotoGP (Motor Sporları) - Canlı</div></div><div class="kutu"><div class="saat-isim">16:00 - S Sport PlusH.Looksuan - Cihan Doğu (Diğer) - Canlı</div></div><div class="kutu"><div class="saat-isim">16:00 - S Sport PlusMaç 2 ATP Roma (Tenis) - Canlı</div></div><div class="kutu"><div class="saat-isim">16:00 - Tivibu Spor 1Antrenman - MotoGP (Motor Sporları) - Canlı</div></div><div class="kutu"><div class="saat-isim">16:30 - TRT Spor YıldızAntalya - Manavgat Belediyesi Yağlı Güreşleri (Diğer)</div></div><div class="kutu"><div class="saat-isim">16:30 - S Sport PlusK.Irving - A.Benwarwar (Diğer) - Canlı</div></div><div class="kutu"><div class="saat-isim">17:00 - S Sport PlusK.Torfunfarm - M.Taoufyq (Diğer) - Canlı</div></div><div class="kutu"><div class="saat-isim">17:30 - TRT SporDünya'dan Spor (Diğer)</div></div><div class="kutu"><div class="saat-isim">17:30 - S Sport PlusK.Sor Sommai - Y.Yint Naung (Diğer) - Canlı</div></div><div class="kutu"><div class="saat-isim">18:00 - S Sport PlusD.Torfunfarm - C.Sor Tienpo (Diğer) - Canlı</div></div><div class="kutu"><div class="saat-isim">18:00 - A SporAna Haber (Diğer)</div></div><div class="kutu"><div class="saat-isim">18:00 - TRT SporTaktik Analiz (Diğer)</div></div><div class="kutu"><div class="saat-isim">18:00 - HT SporAna Haber Bülteni (Diğer)</div></div><div class="kutu"><div class="saat-isim">18:30 - S Sport PlusW.Lukjaoporongtom - T.Casse (Diğer) - Canlı</div></div><div class="kutu"><div class="saat-isim">19:00 - BeIN Sports 5Anadolu Efes - Büyükçekmece Basketbol (Basketbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">19:00 - S Sport PlusEuroLeague Maça Doğru (Diğer) - Canlı</div></div><div class="kutu"><div class="saat-isim">19:30 - S Sport PlusPaderborn - Karlsruhe (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">19:30 - Tivibu Spor 1Paderborn - Karlsruhe (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">19:30 - Tivibu Spor 2Kaiserslautern - Arminia Bielefeld (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">20:00 - A SporAvrupa'dan Futbol (Diğer)</div></div><div class="kutu"><div class="saat-isim">20:00 - S Sport PlusZalgiris Kaunas - Fenerbahçe Beko (Basketbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">20:00 - TRT SporSpor Akşamı (Diğer)</div></div><div class="kutu"><div class="saat-isim">20:00 - Tivibu SporÇorluspor 1947 - Küçükçekmece Sinop (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">20:00 - Tivibu SporEskişehirspor - Ayvalıkgücü Bld. (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">20:00 - Tivibu Spor 4Erciyes 38 FK - Yeşilyurt Bld. (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">20:00 - Tivibu Spor 352 Orduspor - Bozokspor (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">21:00 - A SporArtı Futbol (Diğer)</div></div><div class="kutu"><div class="saat-isim">21:00 - TRT SporAktüel Futbol (Diğer)</div></div><div class="kutu"><div class="saat-isim">21:00 - S Sport PlusMaç 3 ATP Roma (Tenis) - Canlı</div></div><div class="kutu"><div class="saat-isim">21:00 - S Sport PlusZalgiris Kaunas - Fenerbahçe Beko (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">21:30 - Tivibu Spor 1B.Dortmund - Eintracht Frankfurt (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">21:30 - S Sport PlusB.Dortmund - Eintracht Frankfurt (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">21:45 - S Sport PlusTorino - Sassuolo (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">21:45 - BeIN Sports 4Lens - Nantes (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">21:45 - Tivibu Spor 2Torino - Sassuolo (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">22:00 - HT SporGece Yarısı (Diğer)</div></div><div class="kutu"><div class="saat-isim">22:00 - S Sport PlusEuroLeague Maçın Ardından (Diğer) - Canlı</div></div><div class="kutu"><div class="saat-isim">22:00 - TV8Hull City - Millwall (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">22:00 - S Sport PlusLevante - Osasuna (Futbol) - Canlı</div></div><div class="kutu"><div class="saat-isim">23:00 - A SporSon Sayfa (Diğer)</div></div><div class="kutu"><div class="saat-isim">23:00 - TRT Sporİleri Üçlü (Diğer)</div></div><div class="kutu"><div class="saat-isim">00:00 - HT SporHaber Bülteni (Diğer)</div></div><div class="kutu"><div class="saat-isim">01:00 - TRT SporSpor Artı (Diğer)</div></div>
-        <div class="alt-bilgi">Son Güncelleme: 08-05-2026 13:51</div>
+        <div class="header">TV'de Bugün Maç Yayınları</div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="filtrele('Tumu', this)">Tüm gün</button>
+            <button class="tab-btn" onclick="filtrele('Futbol', this)">Futbol</button>
+            <button class="tab-btn" onclick="filtrele('Basketbol', this)">Basketbol</button>
+            <button class="tab-btn" onclick="filtrele('Diger', this)">Diğer</button>
+        </div>
+        <div id="mac-listesi">
+    
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">08:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TV'de Spor</span>
+                        <img src="https://cdnm.sporx.com/_img/close.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Tüm gün - Futbol - Basketbol - Diğer - TRT Spor - İlk Baskı (Diğer) - A Spor - Sabah Sporu (Diğer) - HT Spor - Başlama Vuruşu (Diğer) - 10:00 - TRT Spor - İşitme Engellier Spor Bülteni (Diğer) - 10:00 - HT Spor - Spor Meddahı (Diğer) - 10:25 - TRT Spor - Spor Manşet (Diğer) - 11:00 - A Spor - Spor Ajansı (Diğer) - 11:00 - TRT Spor - Spor Manşet (Diğer) - 11:00 - HT Spor - HT Spor Gündem (Diğer) - 11:45 - Tivibu Spor 1 - Serbest Antrenman 1 MotoGP (Motor Sporları) - 11:45 - S Sport Plus - Serbest Antrenman 1 MotoGP (Motor Sporları) - Canlı - 12:30 - HT Spor - Kürsü (Diğer) - 12:30 - TRT Spor - TRT Gün Ortası (Diğer) - 13:30 - HT Spor - Bakış Açısı (Diğer) - 14:00 - TRT Spor - Spor Stüdyosu (Diğer) - 14:00 - S Sport Plus - Maç 1 ATP Roma (Tenis) - Canlı - 14:00 - A Spor - Gün Ortası (Diğer) - 15:00 - HT Spor - Satır Arası (Diğer) - 15:00 - A Spor - Spor Gündemi (Diğer) - 16:00 - TRT Spor - Gündem Futbol (Diğer) - 16:00 - S Sport Plus - Antrenman MotoGP (Motor Sporları) - Canlı - 16:00 - S Sport Plus - H.Looksuan - Cihan Doğu (Diğer) - Canlı - 16:00 - S Sport Plus - Maç 2 ATP Roma (Tenis) - Canlı - 16:00 - Tivibu Spor 1 - Antrenman - MotoGP (Motor Sporları) - Canlı - 16:30 - TRT Spor Yıldız - Antalya - Manavgat Belediyesi Yağlı Güreşleri (Diğer) - 16:30 - S Sport Plus - K.Irving - A.Benwarwar (Diğer) - Canlı - 17:00 - S Sport Plus - K.Torfunfarm - M.Taoufyq (Diğer) - Canlı - 17:30 - TRT Spor - Dünya'dan Spor (Diğer) - 17:30 - S Sport Plus - K.Sor Sommai - Y.Yint Naung (Diğer) - Canlı - 18:00 - S Sport Plus - D.Torfunfarm - C.Sor Tienpo (Diğer) - Canlı - 18:00 - A Spor - Ana Haber (Diğer) - 18:00 - TRT Spor - Taktik Analiz (Diğer) - 18:00 - HT Spor - Ana Haber Bülteni (Diğer) - 18:30 - S Sport Plus - W.Lukjaoporongtom - T.Casse (Diğer) - Canlı - 19:00 - BeIN Sports 5 - Anadolu Efes - Büyükçekmece Basketbol (Basketbol) - Canlı - 19:00 - S Sport Plus - EuroLeague Maça Doğru (Diğer) - Canlı - 19:30 - S Sport Plus - Paderborn - Karlsruhe (Futbol) - Canlı - 19:30 - Tivibu Spor 1 - Paderborn - Karlsruhe (Futbol) - Canlı - 19:30 - Tivibu Spor 2 - Kaiserslautern - Arminia Bielefeld (Futbol) - Canlı - 20:00 - A Spor - Avrupa'dan Futbol (Diğer) - 20:00 - S Sport Plus - Zalgiris Kaunas - Fenerbahçe Beko (Basketbol) - Canlı - 20:00 - TRT Spor - Spor Akşamı (Diğer) - 20:00 - Tivibu Spor - Çorluspor 1947 - Küçükçekmece Sinop (Futbol) - Canlı - 20:00 - Tivibu Spor - Eskişehirspor - Ayvalıkgücü Bld. (Futbol) - Canlı - 20:00 - Tivibu Spor 4 - Erciyes 38 FK - Yeşilyurt Bld. (Futbol) - Canlı - 20:00 - Tivibu Spor 3 - 52 Orduspor - Bozokspor (Futbol) - Canlı - 21:00 - A Spor - Artı Futbol (Diğer) - 21:00 - TRT Spor - Aktüel Futbol (Diğer) - 21:00 - S Sport Plus - Maç 3 ATP Roma (Tenis) - Canlı - 21:00 - S Sport Plus - Zalgiris Kaunas - Fenerbahçe Beko (Futbol) - Canlı - 21:30 - Tivibu Spor 1 - B.Dortmund - Eintracht Frankfurt (Futbol) - Canlı - 21:30 - S Sport Plus - B.Dortmund - Eintracht Frankfurt (Futbol) - Canlı - 21:45 - S Sport Plus - Torino - Sassuolo (Futbol) - Canlı - 21:45 - BeIN Sports 4 - Lens - Nantes (Futbol) - Canlı - 21:45 - Tivibu Spor 2 - Torino - Sassuolo (Futbol) - Canlı - 22:00 - HT Spor - Gece Yarısı (Diğer) - 22:00 - S Sport Plus - EuroLeague Maçın Ardından (Diğer) - Canlı - 22:00 - TV8 - Hull City - Millwall (Futbol) - Canlı - 22:00 - S Sport Plus - Levante - Osasuna (Futbol) - Canlı - 23:00 - A Spor - Son Sayfa (Diğer) - 23:00 - TRT Spor - İleri Üçlü (Diğer) - 00:00 - HT Spor - Haber Bülteni (Diğer) - 01:00 - TRT Spor - Spor Artı (Diğer) - En Çok Okunanlar - 1 - Galatasaray'dan Danilo için ilk temas! - 2 - Arsenal'in yıldızı Gabriel'den Galatasaray itirafı! - 3 - Hakan Safi'den Enzo Maresca hamlesi - 4 - Fenerbahçe'de sezon sonu en az 10 veda! - 5 - Hull City için kader gecesi!</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">08:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TV'de Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Tüm gün - Futbol - Basketbol - Diğer - TRT Spor - İlk Baskı (Diğer) - A Spor - Sabah Sporu (Diğer) - HT Spor - Başlama Vuruşu (Diğer) - 10:00 - TRT Spor - İşitme Engellier Spor Bülteni (Diğer) - 10:00 - HT Spor - Spor Meddahı (Diğer) - 10:25 - TRT Spor - Spor Manşet (Diğer) - 11:00 - A Spor - Spor Ajansı (Diğer) - 11:00 - TRT Spor - Spor Manşet (Diğer) - 11:00 - HT Spor - HT Spor Gündem (Diğer) - 11:45 - Tivibu Spor 1 - Serbest Antrenman 1 MotoGP (Motor Sporları) - 11:45 - S Sport Plus - Serbest Antrenman 1 MotoGP (Motor Sporları) - Canlı - 12:30 - HT Spor - Kürsü (Diğer) - 12:30 - TRT Spor - TRT Gün Ortası (Diğer) - 13:30 - HT Spor - Bakış Açısı (Diğer) - 14:00 - TRT Spor - Spor Stüdyosu (Diğer) - 14:00 - S Sport Plus - Maç 1 ATP Roma (Tenis) - Canlı - 14:00 - A Spor - Gün Ortası (Diğer) - 15:00 - HT Spor - Satır Arası (Diğer) - 15:00 - A Spor - Spor Gündemi (Diğer) - 16:00 - TRT Spor - Gündem Futbol (Diğer) - 16:00 - S Sport Plus - Antrenman MotoGP (Motor Sporları) - Canlı - 16:00 - S Sport Plus - H.Looksuan - Cihan Doğu (Diğer) - Canlı - 16:00 - S Sport Plus - Maç 2 ATP Roma (Tenis) - Canlı - 16:00 - Tivibu Spor 1 - Antrenman - MotoGP (Motor Sporları) - Canlı - 16:30 - TRT Spor Yıldız - Antalya - Manavgat Belediyesi Yağlı Güreşleri (Diğer) - 16:30 - S Sport Plus - K.Irving - A.Benwarwar (Diğer) - Canlı - 17:00 - S Sport Plus - K.Torfunfarm - M.Taoufyq (Diğer) - Canlı - 17:30 - TRT Spor - Dünya'dan Spor (Diğer) - 17:30 - S Sport Plus - K.Sor Sommai - Y.Yint Naung (Diğer) - Canlı - 18:00 - S Sport Plus - D.Torfunfarm - C.Sor Tienpo (Diğer) - Canlı - 18:00 - A Spor - Ana Haber (Diğer) - 18:00 - TRT Spor - Taktik Analiz (Diğer) - 18:00 - HT Spor - Ana Haber Bülteni (Diğer) - 18:30 - S Sport Plus - W.Lukjaoporongtom - T.Casse (Diğer) - Canlı - 19:00 - BeIN Sports 5 - Anadolu Efes - Büyükçekmece Basketbol (Basketbol) - Canlı - 19:00 - S Sport Plus - EuroLeague Maça Doğru (Diğer) - Canlı - 19:30 - S Sport Plus - Paderborn - Karlsruhe (Futbol) - Canlı - 19:30 - Tivibu Spor 1 - Paderborn - Karlsruhe (Futbol) - Canlı - 19:30 - Tivibu Spor 2 - Kaiserslautern - Arminia Bielefeld (Futbol) - Canlı - 20:00 - A Spor - Avrupa'dan Futbol (Diğer) - 20:00 - S Sport Plus - Zalgiris Kaunas - Fenerbahçe Beko (Basketbol) - Canlı - 20:00 - TRT Spor - Spor Akşamı (Diğer) - 20:00 - Tivibu Spor - Çorluspor 1947 - Küçükçekmece Sinop (Futbol) - Canlı - 20:00 - Tivibu Spor - Eskişehirspor - Ayvalıkgücü Bld. (Futbol) - Canlı - 20:00 - Tivibu Spor 4 - Erciyes 38 FK - Yeşilyurt Bld. (Futbol) - Canlı - 20:00 - Tivibu Spor 3 - 52 Orduspor - Bozokspor (Futbol) - Canlı - 21:00 - A Spor - Artı Futbol (Diğer) - 21:00 - TRT Spor - Aktüel Futbol (Diğer) - 21:00 - S Sport Plus - Maç 3 ATP Roma (Tenis) - Canlı - 21:00 - S Sport Plus - Zalgiris Kaunas - Fenerbahçe Beko (Futbol) - Canlı - 21:30 - Tivibu Spor 1 - B.Dortmund - Eintracht Frankfurt (Futbol) - Canlı - 21:30 - S Sport Plus - B.Dortmund - Eintracht Frankfurt (Futbol) - Canlı - 21:45 - S Sport Plus - Torino - Sassuolo (Futbol) - Canlı - 21:45 - BeIN Sports 4 - Lens - Nantes (Futbol) - Canlı - 21:45 - Tivibu Spor 2 - Torino - Sassuolo (Futbol) - Canlı - 22:00 - HT Spor - Gece Yarısı (Diğer) - 22:00 - S Sport Plus - EuroLeague Maçın Ardından (Diğer) - Canlı - 22:00 - TV8 - Hull City - Millwall (Futbol) - Canlı - 22:00 - S Sport Plus - Levante - Osasuna (Futbol) - Canlı - 23:00 - A Spor - Son Sayfa (Diğer) - 23:00 - TRT Spor - İleri Üçlü (Diğer) - 00:00 - HT Spor - Haber Bülteni (Diğer) - 01:00 - TRT Spor - Spor Artı (Diğer)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">08:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">Tüm gün</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Futbol - Basketbol - Diğer - TRT Spor - İlk Baskı (Diğer) - A Spor - Sabah Sporu (Diğer) - HT Spor - Başlama Vuruşu (Diğer) - 10:00 - TRT Spor - İşitme Engellier Spor Bülteni (Diğer) - 10:00 - HT Spor - Spor Meddahı (Diğer) - 10:25 - TRT Spor - Spor Manşet (Diğer) - 11:00 - A Spor - Spor Ajansı (Diğer) - 11:00 - TRT Spor - Spor Manşet (Diğer) - 11:00 - HT Spor - HT Spor Gündem (Diğer) - 11:45 - Tivibu Spor 1 - Serbest Antrenman 1 MotoGP (Motor Sporları) - 11:45 - S Sport Plus - Serbest Antrenman 1 MotoGP (Motor Sporları) - Canlı - 12:30 - HT Spor - Kürsü (Diğer) - 12:30 - TRT Spor - TRT Gün Ortası (Diğer) - 13:30 - HT Spor - Bakış Açısı (Diğer) - 14:00 - TRT Spor - Spor Stüdyosu (Diğer) - 14:00 - S Sport Plus - Maç 1 ATP Roma (Tenis) - Canlı - 14:00 - A Spor - Gün Ortası (Diğer) - 15:00 - HT Spor - Satır Arası (Diğer) - 15:00 - A Spor - Spor Gündemi (Diğer) - 16:00 - TRT Spor - Gündem Futbol (Diğer) - 16:00 - S Sport Plus - Antrenman MotoGP (Motor Sporları) - Canlı - 16:00 - S Sport Plus - H.Looksuan - Cihan Doğu (Diğer) - Canlı - 16:00 - S Sport Plus - Maç 2 ATP Roma (Tenis) - Canlı - 16:00 - Tivibu Spor 1 - Antrenman - MotoGP (Motor Sporları) - Canlı - 16:30 - TRT Spor Yıldız - Antalya - Manavgat Belediyesi Yağlı Güreşleri (Diğer) - 16:30 - S Sport Plus - K.Irving - A.Benwarwar (Diğer) - Canlı - 17:00 - S Sport Plus - K.Torfunfarm - M.Taoufyq (Diğer) - Canlı - 17:30 - TRT Spor - Dünya'dan Spor (Diğer) - 17:30 - S Sport Plus - K.Sor Sommai - Y.Yint Naung (Diğer) - Canlı - 18:00 - S Sport Plus - D.Torfunfarm - C.Sor Tienpo (Diğer) - Canlı - 18:00 - A Spor - Ana Haber (Diğer) - 18:00 - TRT Spor - Taktik Analiz (Diğer) - 18:00 - HT Spor - Ana Haber Bülteni (Diğer) - 18:30 - S Sport Plus - W.Lukjaoporongtom - T.Casse (Diğer) - Canlı - 19:00 - BeIN Sports 5 - Anadolu Efes - Büyükçekmece Basketbol (Basketbol) - Canlı - 19:00 - S Sport Plus - EuroLeague Maça Doğru (Diğer) - Canlı - 19:30 - S Sport Plus - Paderborn - Karlsruhe (Futbol) - Canlı - 19:30 - Tivibu Spor 1 - Paderborn - Karlsruhe (Futbol) - Canlı - 19:30 - Tivibu Spor 2 - Kaiserslautern - Arminia Bielefeld (Futbol) - Canlı - 20:00 - A Spor - Avrupa'dan Futbol (Diğer) - 20:00 - S Sport Plus - Zalgiris Kaunas - Fenerbahçe Beko (Basketbol) - Canlı - 20:00 - TRT Spor - Spor Akşamı (Diğer) - 20:00 - Tivibu Spor - Çorluspor 1947 - Küçükçekmece Sinop (Futbol) - Canlı - 20:00 - Tivibu Spor - Eskişehirspor - Ayvalıkgücü Bld. (Futbol) - Canlı - 20:00 - Tivibu Spor 4 - Erciyes 38 FK - Yeşilyurt Bld. (Futbol) - Canlı - 20:00 - Tivibu Spor 3 - 52 Orduspor - Bozokspor (Futbol) - Canlı - 21:00 - A Spor - Artı Futbol (Diğer) - 21:00 - TRT Spor - Aktüel Futbol (Diğer) - 21:00 - S Sport Plus - Maç 3 ATP Roma (Tenis) - Canlı - 21:00 - S Sport Plus - Zalgiris Kaunas - Fenerbahçe Beko (Futbol) - Canlı - 21:30 - Tivibu Spor 1 - B.Dortmund - Eintracht Frankfurt (Futbol) - Canlı - 21:30 - S Sport Plus - B.Dortmund - Eintracht Frankfurt (Futbol) - Canlı - 21:45 - S Sport Plus - Torino - Sassuolo (Futbol) - Canlı - 21:45 - BeIN Sports 4 - Lens - Nantes (Futbol) - Canlı - 21:45 - Tivibu Spor 2 - Torino - Sassuolo (Futbol) - Canlı - 22:00 - HT Spor - Gece Yarısı (Diğer) - 22:00 - S Sport Plus - EuroLeague Maçın Ardından (Diğer) - Canlı - 22:00 - TV8 - Hull City - Millwall (Futbol) - Canlı - 22:00 - S Sport Plus - Levante - Osasuna (Futbol) - Canlı - 23:00 - A Spor - Son Sayfa (Diğer) - 23:00 - TRT Spor - İleri Üçlü (Diğer) - 00:00 - HT Spor - Haber Bülteni (Diğer) - 01:00 - TRT Spor - Spor Artı (Diğer)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">08:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">İlk Baskı (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">08:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">A Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/A_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Sabah Sporu (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">08:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">HT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/HT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Başlama Vuruşu (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">10:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">İşitme Engellier Spor Bülteni (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">10:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">HT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/HT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Spor Meddahı (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">10:25</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Spor Manşet (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">11:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">A Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/A_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Spor Ajansı (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">11:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Spor Manşet (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">11:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">HT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/HT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">HT Spor Gündem (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">11:45</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">Tivibu Spor 1</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/Tivibu_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Serbest Antrenman 1 MotoGP (Motor Sporları)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">11:45</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Serbest Antrenman 1 MotoGP (Motor Sporları)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">12:30</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">HT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/HT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Kürsü (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">12:30</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">TRT Gün Ortası (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">13:30</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">HT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/HT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Bakış Açısı (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">14:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Spor Stüdyosu (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">14:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Maç 1 ATP Roma (Tenis)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">14:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">A Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/A_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Gün Ortası (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">15:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">HT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/HT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Satır Arası (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">15:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">A Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/A_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Spor Gündemi (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">16:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Gündem Futbol (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">16:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Antrenman MotoGP (Motor Sporları)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">16:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">H.Looksuan - Cihan Doğu (Diğer)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">16:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Maç 2 ATP Roma (Tenis)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">16:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">Tivibu Spor 1</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/Tivibu_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Antrenman - MotoGP (Motor Sporları)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">16:30</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor Yıldız</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor_Yildiz.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Antalya - Manavgat Belediyesi Yağlı Güreşleri (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">16:30</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">K.Irving - A.Benwarwar (Diğer)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">17:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">K.Torfunfarm - M.Taoufyq (Diğer)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">17:30</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Dünya'dan Spor (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">17:30</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">K.Sor Sommai - Y.Yint Naung (Diğer)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">18:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">D.Torfunfarm - C.Sor Tienpo (Diğer)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">18:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">A Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/A_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Ana Haber (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">18:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Taktik Analiz (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">18:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">HT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/HT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Ana Haber Bülteni (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">18:30</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">W.Lukjaoporongtom - T.Casse (Diğer)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Basketbol">
+                <div class="saat">19:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">BeIN Sports 5</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/Bein_Sports_5.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Anadolu Efes - Büyükçekmece Basketbol (Basketbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">19:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">EuroLeague Maça Doğru (Diğer)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">19:30</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Paderborn - Karlsruhe (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">19:30</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">Tivibu Spor 1</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/Tivibu_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Paderborn - Karlsruhe (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">19:30</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">Tivibu Spor 2</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/Tivibu_Spor2.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Kaiserslautern - Arminia Bielefeld (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">20:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">A Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/A_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Avrupa'dan Futbol (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Basketbol">
+                <div class="saat">20:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Zalgiris Kaunas - Fenerbahçe Beko (Basketbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">20:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Spor Akşamı (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">20:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">Tivibu Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/Tivibu_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Çorluspor 1947 - Küçükçekmece Sinop (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">20:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">Tivibu Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/Tivibu_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Eskişehirspor - Ayvalıkgücü Bld. (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">20:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">Tivibu Spor 4</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/Tivibu_Spor4.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Erciyes 38 FK - Yeşilyurt Bld. (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">20:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">Tivibu Spor 3</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/Tivibu_Spor3.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">52 Orduspor - Bozokspor (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">21:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">A Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/A_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Artı Futbol (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">21:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Aktüel Futbol (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">21:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Maç 3 ATP Roma (Tenis)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">21:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Zalgiris Kaunas - Fenerbahçe Beko (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">21:30</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">Tivibu Spor 1</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/Tivibu_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">B.Dortmund - Eintracht Frankfurt (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">21:30</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">B.Dortmund - Eintracht Frankfurt (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">21:45</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Torino - Sassuolo (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">21:45</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">BeIN Sports 4</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/Bein_Sports_4.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Lens - Nantes (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">21:45</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">Tivibu Spor 2</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/Tivibu_Spor2.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Torino - Sassuolo (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">22:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">HT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/HT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Gece Yarısı (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">22:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">EuroLeague Maçın Ardından (Diğer)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">22:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TV8</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TV8.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Hull City - Millwall (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Futbol">
+                <div class="saat">22:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">S Sport Plus</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/S_Sport_Plus.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Levante - Osasuna (Futbol)</div>
+                </div>
+                <div class="sag">
+                    <div class="canli">Canlı</div>
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">23:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">A Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/A_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Son Sayfa (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">23:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">İleri Üçlü (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">00:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">HT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/HT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Haber Bülteni (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+            <div class="kutu" data-kategori="Diger">
+                <div class="saat">01:00</div>
+                <div class="orta">
+                    <div class="kanal-satiri">
+                        <span class="kanal-isim">TRT Spor</span>
+                        <img src="https://www.sporx.com/_img/day-summaries/channel/TRT_Spor.png" class="kanal-logo">
+                    </div>
+                    <div class="mac-isim">Spor Artı (Diğer)</div>
+                </div>
+                <div class="sag">
+                    
+                </div>
+            </div>
+            
+        </div>
+        <div class="alt-bilgi">Son Güncelleme: 08-05-2026 14:00</div>
+        
+        <script>
+            function filtrele(kategori, btn) {
+                // Tıklanan butonun altını kırmızı çizme efekti
+                var butonlar = document.getElementsByClassName("tab-btn");
+                for (var i = 0; i < butonlar.length; i++) {
+                    butonlar[i].classList.remove("active");
+                }
+                btn.classList.add("active");
+                
+                // Kategorisine göre maçları gizle/göster
+                var maclar = document.getElementsByClassName("kutu");
+                for (var i = 0; i < maclar.length; i++) {
+                    if (kategori === 'Tumu' || maclar[i].getAttribute("data-kategori") === kategori) {
+                        maclar[i].classList.remove("gizli");
+                    } else {
+                        maclar[i].classList.add("gizli");
+                    }
+                }
+            }
+        </script>
     </body>
     </html>
     
